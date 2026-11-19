@@ -106,6 +106,7 @@ async def update_user_avatar_api(file: UploadFile = File(...),db: AsyncSession =
         raise HTTPException(status_code=500, detail="头像保存失败")
     avatar = f"/static/avatars/{filename}"
     user_data = UserUpdate(avatar=avatar)
-    updated_user = await update_user_info(db,user.username,user_data)
+    updated_user, old_avatar = await update_user_info(db,user.username,user_data)
+    delete_user_avatar(old_avatar)
     await delete_cache_by_token(token)
     return success_response(data={"avatar": updated_user.avatar},message="头像修改成功")
